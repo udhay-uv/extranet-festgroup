@@ -25,7 +25,6 @@ export function Register() {
   const [,setEmailValid] = useState(false);
   const [emailError,setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
-  const[billingAddress,setBillingAddress] = useState("");
   const {company} = useParams();
 
   const navigate = useNavigate();
@@ -87,8 +86,7 @@ export function Register() {
         password,
         email,
         contactno,
-        trigram,
-        billingAddress
+        trigram
       });
       localStorage.setItem(`${company}_token`, res.data.token);
       setLoading(false);
@@ -216,18 +214,7 @@ export function Register() {
                 />
                 {trigramError && <p className="text-red-500 text-sm">{trigramError}</p>}
               </div>
-              <div>
-                <Label htmlFor="billingAddress">Billing Address</Label>
-                <Input
-                  id="billingAddress"
-                  type="text"
-                  className="mt-1"
-                  required
-                  value={billingAddress}
-                  onChange={(e) => setBillingAddress(e.target.value)}
-                  disabled={!gstValid}
-                />
-              </div>
+              
             </motion.div>
 
        
