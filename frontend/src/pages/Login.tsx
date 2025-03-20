@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,15 +7,20 @@ import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@/lib/config";
+import { companyMap } from "@/lib/config";
+import useFavicon from "@/lib/faviconhook";
 
-export function SemiconLogin() {
+
+export function Login() {
   const [gstNo, setGstNo] = useState("");
   const [gstValid, setGstValid] = useState(false); 
   const [gstError, setGstError] = useState(""); 
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const {company} = useParams();
   const navigate = useNavigate();
+
+  useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
 
   const handleGstChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -39,14 +44,14 @@ export function SemiconLogin() {
 
     try {
       console.log(gstNo, password);
-      const res = await axios.post(`${BACKEND_URL}/api/s/login`, {
+      const res = await axios.post(`${BACKEND_URL}/api/user/login?company=${company}`, {
         gstNo,
         password,
       });
       console.log(res.data);
-      localStorage.setItem("s_token", res.data.token);
+      localStorage.setItem(`${company}_token`, res.data.token);
       setLoading(false);
-      navigate("/s/home");
+      navigate(`/${company}/home`);
     } catch {
       setLoading(false);
       alert("Error logging in. Please check your credentials.");
@@ -62,14 +67,14 @@ export function SemiconLogin() {
         className="max-w-md w-full space-y-8"
       >
         <Card className="p-8">
-        <div className="text-center">
+          <div className="text-center">
             <motion.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="inline-flex p-4 rounded-full mb-4 bg-green-100 text-green-600"
+              className={`inline-flex p-4 rounded-full mb-4 bg-${companyMap[company as keyof typeof companyMap].color}-100 text-${companyMap[company as keyof typeof companyMap].color}-600`}
             >
-               <img src="/S.png" alt="festa" height={60} width={200} />
+              <img src={`/${companyMap[company as keyof typeof companyMap].image}`} alt="festa" height={60} width={200} />
             </motion.div>
             <motion.h2
               initial={{ opacity: 0 }}
@@ -77,7 +82,7 @@ export function SemiconLogin() {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold text-gray-900"
             >
-              Sign in to Semicon
+              Sign in to {companyMap[company as keyof typeof companyMap].name}
             </motion.h2>
           </div>
 
@@ -124,7 +129,7 @@ export function SemiconLogin() {
             >
               <Button
                 type="submit"
-                className="w-full bg-green-600 hover:bg-green-700"
+                className={`w-full bg-${companyMap[company as keyof typeof companyMap].color}-600 hover:bg-${companyMap[company as keyof typeof companyMap].color}-700`}
                 disabled={!gstValid || loading} 
               >
                 {loading ? "Signing in..." : "Sign in"}
@@ -140,7 +145,7 @@ export function SemiconLogin() {
           >
             <p className="text-sm text-gray-600">
               Don't have an account?{" "}
-              <Link to="/s/register" className="font-medium text-green-600">
+              <Link to={`/${company}/register`} className={`font-medium text-${companyMap[company as keyof typeof companyMap].color}-600`}>
                 Create Account
               </Link>
             </p>

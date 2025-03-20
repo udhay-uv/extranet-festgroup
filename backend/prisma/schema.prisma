@@ -103,6 +103,8 @@ model S_Address{
   contactName String
 
   user S_User @relation(fields: [gstin], references: [gstin])
+  S_order S_Order[] @relation("billingAddress")
+  S_order2 S_Order[] @relation("shippingAddress")
 }
 
 model S_Order{
@@ -119,6 +121,8 @@ model S_Order{
   vehicleRegNo String?
 
   user S_User @relation(fields: [gstin], references: [gstin])
+  billingAddress S_Address @relation(name: "billingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress S_Address @relation(name: "shippingAddress", fields: [shippingAddressId], references: [id])
   orderDetails S_OrderDetails[]
 }
 
@@ -160,6 +164,8 @@ model T_Address{
   contactName String
 
   user T_User @relation(fields: [gstin], references: [gstin])
+  T_order T_Order[] @relation("billingAddress")
+  T_order2 T_Order[] @relation("shippingAddress")
 }
 
 model T_Order{
@@ -176,6 +182,8 @@ model T_Order{
   vehicleRegNo String?
 
   user T_User @relation(fields: [gstin], references: [gstin])
+  billingAddress T_Address @relation(name: "billingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress T_Address @relation(name: "shippingAddress", fields: [shippingAddressId], references: [id])
   orderDetails T_OrderDetails[]
 }
 

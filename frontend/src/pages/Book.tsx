@@ -13,11 +13,12 @@ import {
 import { ProductSelectionDialog } from "@/components/ProductSelectionDialog";
 import { StatusDialog, StatusMessage } from "@/components/StatusDialog";
 import { ConfirmOrderDialog } from "@/components/ConfirmOrderDialog";
-import { A_Navbar } from "@/components/A_Navbar";
-import { BACKEND_URL } from "@/lib/config";
+import { Navbar } from "@/components/Navbar";
+import { BACKEND_URL, companyMap } from "@/lib/config";
 import axios from "axios";
 import { Spinner } from "@/components/Spinner";
-
+import { useNavigate, useParams } from "react-router-dom";
+import useFavicon from "@/lib/faviconhook";
 type Product = {
   brand: string;
   company: string;
@@ -64,6 +65,8 @@ export const BookPage = () => {
   const [products, setProducts] = useState<Product[] | null>(null);
   const [addresses, setAddresses] = useState<Address[] | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const navigate = useNavigate();
+  const {company} = useParams();
 
   const totalAmount = selectedProducts.reduce((total, item) => {
     return total + item.quantity * item.unitPrice;
@@ -141,16 +144,16 @@ export const BookPage = () => {
   const handlePlaceOrder = async () => {
     
     try {
-      console.log(selectedProducts);
-      console.log(selectedBillingAddress);
-      console.log(selectedShippingAddress);
-      const res = await axios.post(`${BACKEND_URL}/api/a/placeorder`, {
-        token: localStorage.getItem("a_token"),
+      // console.log(selectedProducts);
+      // console.log(selectedBillingAddress);
+      // console.log(selectedShippingAddress);
+      const res = await axios.post(`${BACKEND_URL}/api/order/book?company=${company}`, {
+        token: localStorage.getItem(`${company}_token`),
         billingAddressId: selectedBillingAddress?.id,
         shippingAddressId: selectedShippingAddress?.id,
         totalPrice: totalAmount,
         products: selectedProducts,
-        company: "A",
+        company: company?.toUpperCase(),
       });
       console.log(res);
       
@@ -181,20 +184,31 @@ export const BookPage = () => {
   };
 
   async function fetchDetails() {
-    const res1 = await axios.post(`${BACKEND_URL}/api/a/products`, {
-      token: localStorage.getItem("a_token"),
-      company: "A",
+    const res1 = await axios.post(`${BACKEND_URL}/api/product/list?company=${company}`, {
+      token: localStorage.getItem(`${company}_token`),
+      company: company?.toUpperCase(),
     });
-    const res2 = await axios.post(`${BACKEND_URL}/api/a/userinfo`, {
-      token: localStorage.getItem("a_token"),
-      company: "A",
+    if(res1.data.msg==='Unauthorized'){
+      localStorage.removeItem(`${company}_token`);
+      navigate(`/${company}/login`);
+    }   
+    const res2 = await axios.post(`${BACKEND_URL}/api/user/info?company=${company}`, {
+      token: localStorage.getItem(`${company}_token`),
+      company: company?.toUpperCase(),
     });
+    if(res2.data.msg==='Unauthorized'){
+      localStorage.removeItem(`${company}_token`);
+      navigate(`/${company}/login`);
+    }
+
     setProducts(res1.data.products);
     setAddresses(res2.data.address);
     console.log(res1.data.products);
     console.log(res2.data.address);
     setLoading(false);
   }
+
+  useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
 
   useEffect(() => {
     try {
@@ -218,15 +232,15 @@ export const BookPage = () => {
     }
   return (
     <div className="min-h-screen bg-gray-50">
-      <A_Navbar />
+        <Navbar />
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="max-w-5xl mx-auto px-4 py-8"
       >
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-blue-100">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-${companyMap[company as keyof typeof companyMap].color}-100">
           <div className="mb-8">
-            <h2 className="text-2xl font-semibold text-blue-600 flex items-center gap-2">
+            <h2 className="text-2xl font-semibold text-${companyMap[company as keyof typeof companyMap].color}-600 flex items-center gap-2">
               <ShoppingCart className="w-8 h-8" />
               Book Products
             </h2>
@@ -243,7 +257,7 @@ export const BookPage = () => {
                 </h3>
                 <button
                   onClick={() => setIsProductDialogOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className={`flex items-center gap-2 px-4 py-2 bg-${companyMap[company as keyof typeof companyMap].color}-600 text-white rounded-lg hover:bg-${companyMap[company as keyof typeof companyMap].color}-700 transition-colors`}
                 >
                   <Plus className="w-5 h-5" />
                   Add Product
@@ -256,10 +270,10 @@ export const BookPage = () => {
                     key={product.mn}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-${companyMap[company as keyof typeof companyMap].color}-200"
                   >
                     <div className="flex items-center gap-4">
-                      <Package className="w-6 h-6 text-blue-600" />
+                      <Package className="w-6 h-6 text-${companyMap[company as keyof typeof companyMap].color}-600" />
                       <div>
                         <h4 className="font-medium text-gray-900">
                           {product.description}
@@ -309,7 +323,7 @@ export const BookPage = () => {
                               e.target.value
                             )
                           }
-                          className="w-24 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-24 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-${companyMap[company as keyof typeof companyMap].color}-500"
                         />
                       </div>
                       <div className="flex items-center gap-2">
@@ -323,7 +337,7 @@ export const BookPage = () => {
                               e.target.value
                             )
                           }
-                          className="w-24 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-24 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-${companyMap[company as keyof typeof companyMap].color}-500"
                           />
                         </p>
                       </div>
@@ -338,7 +352,7 @@ export const BookPage = () => {
                               e.target.value
                             )
                           }
-                          className="w-24 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          className="w-24 px-2 py-1 border rounded focus:outline-none focus:ring-1 focus:ring-${companyMap[company as keyof typeof companyMap].color}-500"
                           />
                         </p>
                       </div>
@@ -382,15 +396,15 @@ export const BookPage = () => {
                     onClick={() => setSelectedBillingAddress(address)}
                     className={`text-left p-4 rounded-lg border transition-all ${
                       selectedBillingAddress === address
-                        ? "border-blue-500 ring-2 ring-blue-200"
-                        : "border-gray-200 hover:border-blue-200"
+                        ? "border-${companyMap[company as keyof typeof companyMap].color}-500 ring-2 ring-${companyMap[company as keyof typeof companyMap].color}-200"
+                        : "border-gray-200 hover:border-${companyMap[company as keyof typeof companyMap].color}-200"
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-2">
                       {address.type === "Home" ? (
-                        <Home className="w-5 h-5 text-blue-600" />
+                        <Home className="w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600" />
                       ) : (
-                        <Briefcase className="w-5 h-5 text-blue-600" />
+                        <Briefcase className="w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600" />
                       )}
                       <span className="font-medium text-gray-900">
                         {address.type}
@@ -437,14 +451,14 @@ export const BookPage = () => {
                   address.bs==="Shipping" && (
                     <motion.button key={address.id} onClick={() => setSelectedShippingAddress(address)} className={`text-left p-4 rounded-lg border transition-all ${
                       selectedShippingAddress === address
-                        ? "border-blue-500 ring-2 ring-blue-200"
-                        : "border-gray-200 hover:border-blue-200"
+                        ? "border-${companyMap[company as keyof typeof companyMap].color}-500 ring-2 ring-${companyMap[company as keyof typeof companyMap].color}-200"
+                        : "border-gray-200 hover:border-${companyMap[company as keyof typeof companyMap].color}-200"
                     }`}>
                       <div className="flex items-center gap-2 mb-2">
                         {address.type === "Home" ? (
-                          <Home className="w-5 h-5 text-blue-600" />
+                          <Home className="w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600" />
                         ) : (
-                          <Briefcase className="w-5 h-5 text-blue-600" />
+                          <Briefcase className="w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600" />
                         )}
                       </div>
                       <span className="font-medium text-gray-900">
@@ -472,7 +486,7 @@ export const BookPage = () => {
                   Order Summary
                 </h3>
                 <div className="text-right">
-                  <p className="text-2xl font-semibold text-blue-600">
+                  <p className="text-2xl font-semibold text-${companyMap[company as keyof typeof companyMap].color}-600">
                     ₹{totalAmount.toLocaleString()}
                   </p>
                   <p className="text-sm text-gray-500">Total Amount</p>
@@ -482,7 +496,7 @@ export const BookPage = () => {
               <button
                 disabled={selectedProducts.length === 0 || !selectedBillingAddress || !selectedShippingAddress}
                 onClick={() => setIsConfirmDialogOpen(true)}
-                className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition-colors"
+                className={`w-full py-3 bg-${companyMap[company as keyof typeof companyMap].color}-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-${companyMap[company as keyof typeof companyMap].color}-700 transition-colors`}
               >
                 Place Order
               </button>

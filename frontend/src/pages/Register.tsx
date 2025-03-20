@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,8 +7,11 @@ import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "@/lib/config";
+import { companyMap } from "@/lib/config";
+import useFavicon from "@/lib/faviconhook";
 
-export function FestonRegister() {
+
+export function Register() {
   const [gstNo, setGstNo] = useState("");
   const [gstValid, setGstValid] = useState(false); 
   const [name, setName] = useState("");
@@ -22,8 +25,12 @@ export function FestonRegister() {
   const [,setEmailValid] = useState(false);
   const [emailError,setEmailError] = useState("");
   const [loading, setLoading] = useState(false);
+  const[billingAddress,setBillingAddress] = useState("");
+  const {company} = useParams();
 
   const navigate = useNavigate();
+
+  useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
 
   const handleGstChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -74,17 +81,18 @@ export function FestonRegister() {
     if (!gstValid) return; 
 
     try {
-      const res = await axios.post(`${BACKEND_URL}/api/t/register`, {
+      const res = await axios.post(`${BACKEND_URL}/api/user/register?company=${company}`, {
         gstNo,
         name,
         password,
         email,
         contactno,
         trigram,
+        billingAddress
       });
-      localStorage.setItem("t_token", res.data.token);
+      localStorage.setItem(`${company}_token`, res.data.token);
       setLoading(false);
-      navigate("/t/login");
+      navigate(`/${company}/login`);
     } catch (err) {
       setLoading(false);
       alert("Error registering. Please try again.");
@@ -105,9 +113,9 @@ export function FestonRegister() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 260, damping: 20 }}
-              className="inline-flex p-4 rounded-full mb-4 bg-blue-100 text-blue-600"
+              className={`inline-flex p-4  rounded-full mb-4 bg-${companyMap[company as keyof typeof companyMap].color}-100 text-${companyMap[company as keyof typeof companyMap].color}-600`}
             >
-              <img src="/T.jpg" alt="festa" height={60} width={200} />
+              <img src={`/${companyMap[company as keyof typeof companyMap].image}`} alt="festa" height={20} width={200} />
             </motion.div>
             <motion.h2
               initial={{ opacity: 0 }}
@@ -115,7 +123,7 @@ export function FestonRegister() {
               transition={{ delay: 0.2 }}
               className="text-3xl font-bold text-gray-900"
             >
-              Register with Feston
+              Register with {companyMap[company as keyof typeof companyMap].name}
             </motion.h2>
           </div>
 
@@ -208,7 +216,18 @@ export function FestonRegister() {
                 />
                 {trigramError && <p className="text-red-500 text-sm">{trigramError}</p>}
               </div>
-              
+              <div>
+                <Label htmlFor="billingAddress">Billing Address</Label>
+                <Input
+                  id="billingAddress"
+                  type="text"
+                  className="mt-1"
+                  required
+                  value={billingAddress}
+                  onChange={(e) => setBillingAddress(e.target.value)}
+                  disabled={!gstValid}
+                />
+              </div>
             </motion.div>
 
        
@@ -219,7 +238,7 @@ export function FestonRegister() {
             >
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className={`w-full bg-${companyMap[company as keyof typeof companyMap].color}-600 hover:bg-${companyMap[company as keyof typeof companyMap].color}-700`}
                 disabled={!gstValid || loading} 
               >
                 {loading ? "Registering..." : "Register"}
@@ -235,7 +254,7 @@ export function FestonRegister() {
           >
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <Link to="/t/login" className="font-medium text-blue-600">
+              <Link to={`/${company}/login`} className={`font-medium text-${companyMap[company as keyof typeof companyMap].color}-600`}>
                 Sign in
               </Link>
             </p>
