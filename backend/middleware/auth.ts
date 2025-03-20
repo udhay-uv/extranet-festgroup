@@ -13,7 +13,6 @@ export const authMiddleware = (req:any,res:any,next:any)=>{
     next();
     }
     catch(err){
-        console.log(err);
-        res.status(401).json({msg:"Unauthorized"});
+        res.status(200).json({msg:"Unauthorized"});
     }
 }

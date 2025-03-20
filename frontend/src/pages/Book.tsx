@@ -8,7 +8,7 @@ import {
   ShoppingCart,
   Home,
   Briefcase,
-  DollarSign,
+  IndianRupee,
 } from "lucide-react";
 import { ProductSelectionDialog } from "@/components/ProductSelectionDialog";
 import { StatusDialog, StatusMessage } from "@/components/StatusDialog";
@@ -60,6 +60,7 @@ export const BookPage = () => {
   const [isProductDialogOpen, setIsProductDialogOpen] = useState(false);
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState<StatusMessage | null>(null);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
   
   
   const [products, setProducts] = useState<Product[] | null>(null);
@@ -142,7 +143,7 @@ export const BookPage = () => {
  
   };
   const handlePlaceOrder = async () => {
-    
+    setButtonLoading(true);
     try {
       // console.log(selectedProducts);
       // console.log(selectedBillingAddress);
@@ -176,11 +177,8 @@ export const BookPage = () => {
       });
     }
     setIsConfirmDialogOpen(false);
-    setSelectedProducts([]);
-    setSelectedBillingAddress(null);
-    setSelectedShippingAddress(null);
-    setStatusMessage(null);
-
+   
+    setButtonLoading(false);
   };
 
   async function fetchDetails() {
@@ -188,6 +186,7 @@ export const BookPage = () => {
       token: localStorage.getItem(`${company}_token`),
       company: company?.toUpperCase(),
     });
+    console.log(res1.data);
     if(res1.data.msg==='Unauthorized'){
       localStorage.removeItem(`${company}_token`);
       navigate(`/${company}/login`);
@@ -265,6 +264,21 @@ export const BookPage = () => {
               </div>
 
               <div className="space-y-4">
+              {selectedProducts.length > 0 && (
+                  <div className="flex items-center justify-between p-2 bg-gray-100 rounded-lg font-medium text-gray-700">
+                    <div className="flex items-center gap-4" style={{ width: '30%' }}>
+                      <div className="ml-10">Product</div>
+                    </div>
+                    <div className="flex items-center gap-6" style={{ width: '70%' }}>
+                      <div className="w-24 text-center">Quantity</div>
+                      <div className="w-24 text-center ml-2">Unit Price</div>
+                      <div className="w-24 text-center">CGST %</div>
+                      <div className="w-24 text-center">SGST %</div>
+                      <div className="text-right mr-12">Total</div>
+                    </div>
+                  </div>
+                )}
+              
                 {selectedProducts.map(({ product, quantity, unitPrice, cgst, sgst }) => (
                   <motion.div
                     key={product.mn}
@@ -313,7 +327,7 @@ export const BookPage = () => {
                         </button>
                       </div>
                       <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-gray-400" />
+                        <IndianRupee className="w-4 h-4 text-gray-400" />
                         <input
                           type="number"
                           value={unitPrice}
@@ -412,17 +426,7 @@ export const BookPage = () => {
                     </div>
 
                     <div className="space-y-2">
-                      {/* <div className="flex items-start gap-2">
-                        <MapPin className="w-4 h-4 text-gray-400 mt-1" />
-                        <div>
-                          <p className="text-sm text-gray-600">
-                            Billing Address:
-                          </p>
-                          <p className="text-sm text-gray-900">
-                            {address.billingAddress}
-                          </p>
-                        </div>
-                      </div> */}
+                    
 
                       <div className="flex items-start gap-2">
                         <Building className="w-4 h-4 text-gray-400 mt-1" />
@@ -507,7 +511,10 @@ export const BookPage = () => {
 
       <ProductSelectionDialog
         isOpen={isProductDialogOpen}
-        onClose={() => setIsProductDialogOpen(false)}
+        onClose={() => {
+          setIsProductDialogOpen(false);
+         
+        }}
         onSelectProduct={handleAddProduct}
         products={products || []}
       />
@@ -516,10 +523,14 @@ export const BookPage = () => {
         {isConfirmDialogOpen && (
           <ConfirmOrderDialog
             isOpen={isConfirmDialogOpen}
-            onClose={() => setIsConfirmDialogOpen(false)}
+            onClose={() => {
+              setIsConfirmDialogOpen(false);
+      
+            }}
             onConfirm={handlePlaceOrder}
             totalAmount={totalAmount}
             productCount={selectedProducts.length}
+            buttonLoading={buttonLoading}
           />
         )}
       </AnimatePresence>
@@ -528,7 +539,12 @@ export const BookPage = () => {
         {statusMessage && (
           <StatusDialog
             status={statusMessage}
-            onClose={() => setStatusMessage(null)}
+            onClose={() => {
+              setStatusMessage(null);
+              setSelectedProducts([]);
+              setSelectedBillingAddress(null);
+              setSelectedShippingAddress(null);
+            }}
           />
         )}
       </AnimatePresence>

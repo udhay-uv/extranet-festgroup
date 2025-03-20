@@ -16,6 +16,7 @@ import {
     onConfirm: () => void;
     totalAmount: number;
     productCount: number;
+    buttonLoading: boolean;
   };
   
   export const ConfirmOrderDialog = ({
@@ -24,6 +25,7 @@ import {
     onConfirm,
     totalAmount,
     productCount,
+    buttonLoading
   }: ConfirmOrderDialogProps) => (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-gradient-to-br from-blue-50 to-white border-blue-200 shadow-xl sm:max-w-md">
@@ -66,9 +68,10 @@ import {
           </Button>
           <Button
             onClick={onConfirm}
+            disabled={buttonLoading}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            Confirm Order
+            {buttonLoading ? 'Confirming...': "Confirm Order"}
           </Button>
         </DialogFooter>
       </DialogContent>

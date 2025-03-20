@@ -214,7 +214,6 @@ export const HomePage = () => {
       localStorage.removeItem(`${company}_token`);
       navigate(`/${company}/login`);
     }
-    console.log(res.data);
     res.data.user.company=company;
     setUserInfo(res.data.user);
 
@@ -252,10 +251,10 @@ export const HomePage = () => {
     try {
       setButtonLoading(true);
       console.log(newAddress);
-      const res = await axios.post(`${BACKEND_URL}/api/${company}/addaddress`,{
+      const res = await axios.post(`${BACKEND_URL}/api/user/addaddress?company=${company}`,{
         ...newAddress,
         token:localStorage.getItem(`${company}_token`) || "",
-        company:company?.toUpperCase(),
+        company:company,
       });
       console.log(res.data);
       setAddress([...(address || []), res.data.address]);
@@ -278,10 +277,10 @@ export const HomePage = () => {
     try {
       setButtonLoading(true);
       console.log(updatedAddress)
-      const res = await axios.post(`${BACKEND_URL}/api/${company}/updateaddress`,{
+      const res = await axios.post(`${BACKEND_URL}/api/user/updateaddress?company=${company}`,{
         ...updatedAddress,
         token:localStorage.getItem(`${company}_token`) || "",
-        company:company?.toUpperCase(),
+        company:company,
       });
       console.log(res.data);
       setAddress((address || []).map(addr => 
