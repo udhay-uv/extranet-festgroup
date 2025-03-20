@@ -18,11 +18,13 @@ import {
   IndianRupee
 } from 'lucide-react';
 
-import { A_Navbar } from '@/components/A_Navbar';
+import { Navbar } from '@/components/Navbar';
 import axios from 'axios';
 import { BACKEND_URL } from '@/lib/config';
 import { Spinner } from '@/components/Spinner';
-
+import { useNavigate, useParams } from 'react-router-dom';
+import { companyMap } from '@/lib/config';
+import useFavicon from '@/lib/faviconhook';
 // Match the data structure from the backend
 type OrderDetail = {
   id: number;
@@ -80,14 +82,20 @@ export const OrdersPage = () => {
   const [fileUpload, setFileUpload] = useState<File | null>(null);
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [vehicleRegNo, setVehicleRegNo] = useState<string>("");
+  const [, setVehicleRegNo] = useState<string>("");
+  const navigate = useNavigate();
+  const {company} = useParams();
 
   async function getOrders() {
     try {
-      const res = await axios.post(`${BACKEND_URL}/api/a/orders`, {
-        token: localStorage.getItem("a_token"),
-        company: "A"
+      const res = await axios.post(`${BACKEND_URL}/api/order/list?company=${company}`, {
+        token: localStorage.getItem(`${company}_token`),
+        company: company?.toUpperCase()
       });
+      if(res.data.msg==='Unauthorized'){
+        localStorage.removeItem(`${company}_token`);
+        navigate(`/${company}/login`);
+      }
       setOrders(res.data.orders);
       setLoading(false);
       console.log(res.data.orders);
@@ -96,13 +104,14 @@ export const OrdersPage = () => {
       setLoading(false);
     }
   }
+  useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
 
   useEffect(() => {
     getOrders();
   }, []);
 
   const getFilteredOrders = useMemo(() => {
-    if (loading) {
+    if (loading) {      
       return [];
     }
     switch (activeTab) {
@@ -115,18 +124,32 @@ export const OrdersPage = () => {
     }
   }, [activeTab, orders, loading]);
 
-  const handleFileUpload = (orderId: string) => {
+  const handleFileUpload = async (orderId: string) => {
     if (!fileUpload) {
       alert('Please select a file first');
       return;
     }
-    // Simulate file upload
-    alert('File uploaded successfully');
+    const res = await axios.post(`${BACKEND_URL}/api/order/uploadpaymentproof?company=${company}`, {
+      token: localStorage.getItem(`${company}_token`),
+      orderId: orderId,
+      paymentFile: fileUpload,
+      company: company?.toUpperCase()
+    },{
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    if(res.data.msg==='Unauthorized'){
+      localStorage.removeItem(`${company}_token`);
+      navigate(`/${company}/login`);
+    }
     setFileUpload(null);
+    alert('File uploaded successfully');
   };
 
   const handleStatusUpdate = (orderId: string, newStatus: number) => {
     // Simulate status update
+    console.log(orderId, newStatus);
     alert('Order status updated successfully');
   };
 
@@ -145,7 +168,7 @@ export const OrdersPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <A_Navbar />
+      <Navbar />
       
       <motion.div
         initial={{ opacity: 0 }}
@@ -161,11 +184,11 @@ export const OrdersPage = () => {
           >
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-semibold text-blue-600">Your Orders</h2>
+                <h2 className={`text-2xl font-semibold text-${companyMap[company as keyof typeof companyMap].color}-600`}>Your Orders</h2>
                 <p className="text-gray-600 mt-2">Track and manage your orders</p>
               </div>
               <div className="flex items-center gap-2">
-                <ListFilter className="w-5 h-5 text-blue-600" />
+                <ListFilter className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600`} />
                 <span className="text-gray-600">Filter by status</span>
               </div>
             </div>
@@ -175,8 +198,8 @@ export const OrdersPage = () => {
                 onClick={() => setActiveTab('all')}
                 className={`flex-1 rounded-md py-2.5 text-sm font-medium transition-all duration-200 ${
                   activeTab === 'all'
-                    ? 'bg-white text-blue-600 shadow'
-                    : 'text-gray-600 hover:text-blue-600'
+                    ? `bg-white text-${companyMap[company as keyof typeof companyMap].color}-600 shadow`
+                    : `text-gray-600 hover:text-${companyMap[company as keyof typeof companyMap].color}-600`
                 }`}
               >
                 All Orders
@@ -185,8 +208,8 @@ export const OrdersPage = () => {
                 onClick={() => setActiveTab('pending')}
                 className={`flex-1 rounded-md py-2.5 text-sm font-medium transition-all duration-200 ${
                   activeTab === 'pending'
-                    ? 'bg-white text-blue-600 shadow'
-                    : 'text-gray-600 hover:text-blue-600'
+                    ? `bg-white text-${companyMap[company as keyof typeof companyMap].color}-600 shadow`
+                    : `text-gray-600 hover:text-${companyMap[company as keyof typeof companyMap].color}-600`
                 }`}
               >
                 Pending Orders
@@ -195,8 +218,8 @@ export const OrdersPage = () => {
                 onClick={() => setActiveTab('completed')}
                 className={`flex-1 rounded-md py-2.5 text-sm font-medium transition-all duration-200 ${
                   activeTab === 'completed'
-                    ? 'bg-white text-blue-600 shadow'
-                    : 'text-gray-600 hover:text-blue-600'
+                    ? `bg-white text-${companyMap[company as keyof typeof companyMap].color}-600 shadow`
+                    : `text-gray-600 hover:text-${companyMap[company as keyof typeof companyMap].color}-600`
                 }`}
               >
                 Completed Orders
@@ -222,11 +245,11 @@ export const OrdersPage = () => {
                 >
                   <button
                     onClick={() => setSelectedOrder(selectedOrder === order.orderNo ? null : order.orderNo)}
-                    className="w-full bg-white border border-blue-200 rounded-lg p-4 hover:bg-blue-50 transition-colors"
+                    className={`w-full bg-white border border-${companyMap[company as keyof typeof companyMap].color}-200 rounded-lg p-4 hover:bg-${companyMap[company as keyof typeof companyMap].color}-50 transition-colors`}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <Package className="w-6 h-6 text-blue-600" />
+                        <Package className={`w-6 h-6 text-${companyMap[company as keyof typeof companyMap].color}-600`} />
                         <div className="text-left">
                           <h3 className="font-medium text-gray-900">{order.orderNo}</h3>
                           <p className="text-sm text-gray-500">
@@ -242,9 +265,9 @@ export const OrdersPage = () => {
                         </span>
                         <span className="font-medium text-gray-900">₹{order.totalPrice}</span>
                         {selectedOrder === order.orderNo ? (
-                          <ChevronUp className="w-5 h-5 text-blue-600" />
+                          <ChevronUp className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600`} />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-blue-600" />
+                          <ChevronDown className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600`} />
                         )}
                       </div>
                     </div>
@@ -256,7 +279,7 @@ export const OrdersPage = () => {
                             initial={{ width: 0 }}
                             animate={{ width: `${getStatusProgress(order.status)}%` }}
                             transition={{ duration: 1, ease: "easeOut" }}
-                            className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-600"
+                            className={`shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-${companyMap[company as keyof typeof companyMap].color}-600`}
                           />
                         </div>
                       </div>
@@ -276,7 +299,7 @@ export const OrdersPage = () => {
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div className="space-y-4">
                               <div className="flex items-start gap-3">
-                                <MapPin className="w-5 h-5 text-blue-600 mt-1" />
+                                <MapPin className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600 mt-1`} />
                                 <div>
                                   <p className="font-medium text-gray-700">Shipping Address</p>
                                   <p className="text-gray-600">{order.shippingAddress.address}</p>
@@ -286,7 +309,7 @@ export const OrdersPage = () => {
                               </div>
 
                               <div className="flex items-start gap-3">
-                                <Building className="w-5 h-5 text-blue-600 mt-1" />
+                                <Building className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600 mt-1`} />
                                 <div>
                                   <p className="font-medium text-gray-700">GSTIN</p>
                                   <p className="text-gray-600">{order.gstin}</p>
@@ -294,7 +317,7 @@ export const OrdersPage = () => {
                               </div>
                               <div className="bg-white rounded-lg p-4 border border-blue-100">
                                 <h4 className="font-medium text-gray-900 flex items-center gap-2 mb-4">
-                                  <Box className="w-5 h-5 text-blue-600" />
+                                  <Box className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600`} />
                                   Order Details
                                 </h4>
                                 <div className="space-y-3">
@@ -324,7 +347,7 @@ export const OrdersPage = () => {
 
                               {order.vehicleRegNo && order.vehicleRegNo !== "null" && (
                                 <div className="flex items-start gap-3">
-                                  <Truck className="w-5 h-5 text-blue-600 mt-1" />
+                                  <Truck className={`w-5 h-5 text-${companyMap[company as keyof typeof companyMap].color}-600 mt-1`} />
                                   <div>
                                     <p className="font-medium text-gray-700">Vehicle Registration</p>
                                     <p className="text-gray-600">{order.vehicleRegNo}</p>
@@ -350,7 +373,7 @@ export const OrdersPage = () => {
                                       className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                     />
                                     <button
-                                      onClick={() => handleStatusUpdate(order.orderNo, 2)}
+                                      onClick={() => handleFileUpload(order.orderNo)}
                                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
                                     >
                                       Upload Payment Proof

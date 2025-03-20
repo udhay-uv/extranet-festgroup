@@ -12,11 +12,13 @@ import {
   LayoutList,
   Grid
 } from 'lucide-react';
-import { A_Navbar } from '@/components/A_Navbar';
+import { Navbar } from '@/components/Navbar';
 import axios from 'axios';
 import { BACKEND_URL } from '@/lib/config';
 import { Spinner } from '@/components/Spinner';
-
+import { useNavigate, useParams } from 'react-router-dom';
+import { companyMap } from '@/lib/config';
+import useFavicon from '@/lib/faviconhook';
 type Product = {
   brand: string;
   company: string;
@@ -47,7 +49,8 @@ export const ProductsPage = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [products,setProducts]=useState<Product[] | null>(null);
   const [loading,setLoading]=useState<boolean>(true);
-  console.log(searchQuery)
+  const navigate = useNavigate();
+  const {company} = useParams();
 
   const filteredProducts = useMemo(()=>{
       if(!products)
@@ -64,12 +67,18 @@ export const ProductsPage = () => {
 
   },[products,activeType,searchQuery]);
 
+  useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
+
   async function fetchProducts()
   {
-     const res=await axios.post(`${BACKEND_URL}/api/a/products`,{
-        company:"A",
-        token:localStorage.getItem("a_token")
+     const res=await axios.post(`${BACKEND_URL}/api/product/list?company=${company}`,{
+        company:company?.toUpperCase(),
+        token:localStorage.getItem(`${company}_token`)
      });
+     if(res.data.msg==='Unauthorized'){
+      localStorage.removeItem(`${company}_token`);
+      navigate(`/${company}/login`);
+     }
      setProducts(res.data.products);
      setLoading(false);
   }
@@ -119,7 +128,7 @@ export const ProductsPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <A_Navbar />
+      <Navbar />
       
       <motion.div
         initial={{ opacity: 0 }}
@@ -127,7 +136,7 @@ export const ProductsPage = () => {
         transition={{ delay: 0.2 }}
         className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
       >
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-blue-100">
+        <div className={`bg-white rounded-xl shadow-lg p-6 border border-${companyMap[company as keyof typeof companyMap].color}-100`}>
           <motion.div
             initial={{ y: -20 }}
             animate={{ y: 0 }}
@@ -135,7 +144,7 @@ export const ProductsPage = () => {
           >
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
               <div>
-                <h2 className="text-2xl font-semibold text-blue-600 flex items-center gap-2">
+                <h2 className={`text-2xl font-semibold text-${companyMap[company as keyof typeof companyMap].color}-600 flex items-center gap-2`}>
                   <SunMedium className="w-8 h-8" />
                   Solar Products
                 </h2>
@@ -144,25 +153,25 @@ export const ProductsPage = () => {
               
               <div className="flex items-center gap-4">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 text-${companyMap[company as keyof typeof companyMap].color}-400 w-5 h-5`} />
                   <input
                     type="text"
                     placeholder="Search products..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className={`w-64 pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-${companyMap[company as keyof typeof companyMap].color}-500 focus:border-transparent`}
                   />
                 </div>
                 <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
                   <button
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow text-blue-600' : 'text-gray-600'}`}
+                    className={`p-2 rounded ${viewMode === 'grid' ? 'bg-white shadow text-${companyMap[company as keyof typeof companyMap].color}-600' : 'text-gray-600'}`}
                   >
                     <Grid className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setViewMode('list')}
-                    className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow text-blue-600' : 'text-gray-600'}`}
+                    className={`p-2 rounded ${viewMode === 'list' ? 'bg-white shadow text-${companyMap[company as keyof typeof companyMap].color}-600' : 'text-gray-600'}`}
                   >
                     <LayoutList className="w-5 h-5" />
                   </button>
@@ -179,7 +188,7 @@ export const ProductsPage = () => {
                   onClick={() => setActiveType(type)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                     activeType === type
-                      ? 'bg-blue-600 text-white'
+                      ? `bg-${companyMap[company as keyof typeof companyMap].color}-600 text-white`
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
@@ -198,7 +207,7 @@ export const ProductsPage = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.2 }}
               className={viewMode === 'grid' ? 
-                "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" : 
+                `grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6` : 
                 "space-y-4"
               }
             >
