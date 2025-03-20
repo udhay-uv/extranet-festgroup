@@ -1,0 +1,214 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+
+model A_User{
+  id Int @id @default(autoincrement())
+  gstin String @unique
+  password String
+  name String
+  sales String?
+  email String?
+  contactNo String?  
+
+  address A_Address[]
+  orders A_Order[]
+}
+
+
+model A_Address{
+  id Int @id @default(autoincrement())
+  gstin String
+  bs String
+  type String
+  address String
+  phone String
+  contactName String
+
+  user A_User @relation(fields: [gstin], references: [gstin])
+  A_order A_Order[] @relation("billingAddress")
+  A_order2 A_Order[] @relation("shippingAddress")
+}
+
+model A_Order{
+  id Int @id @default(autoincrement())
+  orderNo String @unique
+  gstin String
+  billingAddressId Int
+  shippingAddressId Int
+  timeStamp String
+  orderDate String
+  totalPrice Decimal
+  status Int @default(0)
+  paymentFile String?
+  vehicleRegNo String?
+
+  user A_User @relation(fields: [gstin], references: [gstin])
+  billingAddress A_Address @relation(name: "billingAddress", fields: [billingAddressId], references: [id])
+  shippingAddress A_Address @relation(name: "shippingAddress", fields: [shippingAddressId], references: [id])
+  orderDetails A_OrderDetails[]
+}
+
+
+model A_OrderDetails{
+  id Int @id @default(autoincrement())
+  orderId String
+  modelNumber String
+  quantity Int
+  unitPrice Decimal
+  netPrice Decimal
+  cgst Decimal
+  sgst Decimal
+  totalAmount Decimal
+  
+
+
+  order A_Order @relation(fields: [orderId], references: [orderNo])
+  product Product @relation(fields: [modelNumber], references: [mn])
+}
+
+
+model S_User{
+  id Int @id @default(autoincrement())
+  gstin String @unique
+  password String
+  name String
+  sales String?
+  email String?
+  contactNo String?
+
+  address S_Address[]
+  orders S_Order[]
+}
+
+model S_Address{
+  id Int @id @default(autoincrement())
+  gstin String
+  bs String
+  type String
+  address String
+  phone String
+  contactName String
+
+  user S_User @relation(fields: [gstin], references: [gstin])
+}
+
+model S_Order{
+  id Int @id @default(autoincrement())
+  orderNo String @unique
+  gstin String
+  billingAddressId Int
+  shippingAddressId Int
+  timeStamp String
+  orderDate String
+  totalPrice Decimal
+  status Int @default(0)
+  paymentFile String?
+  vehicleRegNo String?
+
+  user S_User @relation(fields: [gstin], references: [gstin])
+  orderDetails S_OrderDetails[]
+}
+
+model S_OrderDetails{
+  id Int @id @default(autoincrement())
+  orderId String
+  modelNumber String
+  quantity Int
+  unitPrice Decimal
+  netPrice Decimal
+  cgst Decimal
+  sgst Decimal
+  totalAmount Decimal
+
+  order S_Order @relation(fields: [orderId], references: [orderNo])
+  product Product @relation(fields: [modelNumber], references: [mn])
+}
+
+model T_User{
+  id Int @id @default(autoincrement())
+  gstin String @unique
+  password String
+  name String
+  sales String?
+  email String?
+  contactNo String?
+
+  address T_Address[]
+  orders T_Order[]
+}
+
+model T_Address{
+  id Int @id @default(autoincrement())
+  gstin String
+  bs String
+  type String
+  address String
+  phone String
+  contactName String
+
+  user T_User @relation(fields: [gstin], references: [gstin])
+}
+
+model T_Order{
+  id Int @id @default(autoincrement())
+  orderNo String @unique
+  gstin String
+  billingAddressId Int
+  shippingAddressId Int
+  timeStamp String
+  orderDate String
+  totalPrice Decimal
+  status Int @default(0)
+  paymentFile String?
+  vehicleRegNo String?
+
+  user T_User @relation(fields: [gstin], references: [gstin])
+  orderDetails T_OrderDetails[]
+}
+
+model T_OrderDetails{
+  id Int @id @default(autoincrement())
+  orderId String
+  modelNumber String
+  quantity Int
+  unitPrice Decimal
+  netPrice Decimal
+  cgst Decimal
+  sgst Decimal
+  totalAmount Decimal
+
+  order T_Order @relation(fields: [orderId], references: [orderNo])
+  product Product @relation(fields: [modelNumber], references: [mn])
+}
+
+
+model Product{
+  id Int @id @default(autoincrement())
+  brand String
+  company String
+  family String?
+  mn String @unique
+  type String
+  power String?
+  description String?
+  quantity Int
+
+
+  orderDetails_A A_OrderDetails[]
+  orderDetails_S S_OrderDetails[]
+  orderDetails_T T_OrderDetails[]
+}
+
