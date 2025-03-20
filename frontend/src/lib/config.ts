@@ -12,7 +12,7 @@ export const companyMap = {
     },
     "s": {  
         name: "Semicon",
-        color: "green",
+        color: "blue",
         image:"s.png",
         favicon:"s_favicon.png"
     },
