@@ -5,3 +5,5 @@ backend/node_modules
 # Keep environment variables out of version control
 backend/.env
 frontend/.env
+
+.env
