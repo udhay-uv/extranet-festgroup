@@ -18,6 +18,9 @@ function App() {
 
         
         <Route path="/" element={<Navigate to="/a/login" />} />
+        <Route path="/s" element={<Navigate to="/s/login" />} />
+        <Route path="/t" element={<Navigate to="/t/login" />} />
+
         <Route path="/:company/login" element={<Login />} />
         <Route path="/:company/register" element={<Register />} />
         <Route path="/:company/home" element={<HomePage />} />
