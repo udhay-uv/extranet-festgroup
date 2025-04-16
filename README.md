@@ -1,4 +1,4 @@
-# Festgruop Extranet 
+# Festgroup Extranet 
 
 This project consists of a frontend and backend application that can be run locally using a simple startup script.
 
