@@ -19,7 +19,7 @@ export const companyMap = {
     "t": {
         name: "Feston",
         color: "blue",
-        image:"t.jpg",
+        image:"t.png",
         favicon:"t_favicon.png"
     }
 }
