@@ -9,6 +9,7 @@ import { HomePage } from './pages/Home';
 import {OrdersPage} from './pages/OrderDetails';
 import { ProductsPage } from './pages/Products';
 import { BookPage } from './pages/Book';
+import { GSTINTable } from './pages/CustomerTable';
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/t" element={<Navigate to="/t/login" />} />
 
         <Route path="/:company/login" element={<Login />} />
+        <Route path="/:company/sales_customer" element={<GSTINTable />} />
         <Route path="/:company/register" element={<Register />} />
         <Route path="/:company/home" element={<HomePage />} />
         <Route path="/:company/orders" element={<OrdersPage />} />

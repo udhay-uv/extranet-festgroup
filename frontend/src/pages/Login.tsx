@@ -11,12 +11,16 @@ import { companyMap } from "@/lib/config";
 import useFavicon from "@/lib/faviconhook";
 
 
+type tabProps = "gstin" | "trigram";
+
 export function Login() {
   const [gstNo, setGstNo] = useState("");
   const [gstValid, setGstValid] = useState(false); 
   const [gstError, setGstError] = useState(""); 
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [tabs,setTabs]=useState<tabProps>("gstin");
+  const [trigram, setTrigram] = useState("");
   const {company} = useParams();
   const navigate = useNavigate();
 
@@ -58,6 +62,32 @@ export function Login() {
     }
   };
 
+  const onTrigramSubmit = async (e: React.FormEvent) => {
+    setLoading(true);
+    e.preventDefault(); 
+    if(trigram.length!=3)
+    {
+      alert("enter valid trigram")
+      setLoading(false);
+      return;
+
+    }
+
+    try {
+      console.log(trigram);
+      const res = await axios.post(`${BACKEND_URL}/api/user/trigram?company=${company}`, {
+        trigram
+      });
+      console.log(res.data);
+      navigate(`/${company}/sales_customer?trigram=${trigram}`);
+    }
+    catch {
+      setLoading(false);
+      alert("Error logging in. Please check your credentials.");
+    }
+  };
+
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
@@ -66,6 +96,7 @@ export function Login() {
         transition={{ duration: 0.5 }}
         className="max-w-md w-full space-y-8"
       >
+        
         <Card className="p-8">
           <div className="text-center">
             <motion.div
@@ -85,6 +116,15 @@ export function Login() {
               Sign in to {companyMap[company as keyof typeof companyMap].name}
             </motion.h2>
           </div>
+          <div className="flex justify-center mt-4">
+            <Button variant="link" onClick={() => setTabs("gstin")} className={`mr-4 ${tabs === "gstin" ? "text-blue-600" : "text-gray-500"}`}>
+              GSTIN
+            </Button>
+            <Button variant="link" onClick={() => setTabs("trigram")} className={`${tabs === "trigram" ? "text-blue-600" : "text-gray-500"}`}>
+              Trigram
+            </Button>
+          </div>
+          {tabs==='gstin' && 
 
           <form className="mt-8 space-y-6" onSubmit={onSubmit}>
             <motion.div
@@ -136,6 +176,45 @@ export function Login() {
               </Button>
             </motion.div>
           </form>
+          }
+          {tabs==='trigram' &&
+          <form className="mt-8 space-y-6" onSubmit={onTrigramSubmit}>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-4"
+            >
+  
+              <div>
+                <Label htmlFor="trigram">Trigram</Label>
+                <Input
+                  id="trigram"
+                  type="text"
+                  className="mt-1"
+                  required
+                  value={trigram}
+                  onChange={(e) => setTrigram(e.target.value)}
+               
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button
+                type="submit"
+                className={`w-full bg-${companyMap[company as keyof typeof companyMap].color}-600 hover:bg-${companyMap[company as keyof typeof companyMap].color}-700`}
+                disabled={loading} 
+              >
+                {loading ? "Signing in..." : "Sign in"}
+              </Button>
+            </motion.div>
+          </form>
+          }
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -151,6 +230,7 @@ export function Login() {
             </p>
           </motion.div>
         </Card>
+
       </motion.div>
     </div>
   );

@@ -98,6 +98,116 @@ export const login = async (req:any,res:any)=>{
     
 }
 
+export const checkTrigram = async (req:any,res:any)=>{
+    const {trigram} = req.body;
+    const company = req.query.company;
+    try{
+        let response;
+        if(company==='a'){
+            response = await prisma.a_User.findMany({
+                where:{
+                    sales:trigram,
+                }
+            })
+        }
+        else if(company==='s'){
+            response = await prisma.s_User.findMany({
+                where:{
+                    sales:trigram,
+                }
+            })
+        }
+        else if(company==='t'){
+            response = await prisma.t_User.findMany({
+                where:{
+                    sales:trigram,
+                }
+            })
+        }
+        if(response && response.length===0){
+            return res.status(500).json({msg:"No user found"});
+        }
+
+        res.status(200).json({response});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({msg:"error"});
+    }
+}
+
+export const userTrigramLogin = async (req:any,res:any)=>{
+    try{
+        const {gstNo} = req.body;
+        const company = req.query.company;
+        let response;
+        if(company==='a'){
+            response = await prisma.a_User.findUnique({
+                where:{
+                    gstin:gstNo,
+                }
+            })
+        }
+        else if(company==='s'){
+            response = await prisma.s_User.findUnique({
+                where:{
+                    gstin:gstNo,
+                }
+            })
+        }
+        else if(company==='t'){
+            response = await prisma.t_User.findUnique({
+                where:{
+                    gstin:gstNo,
+                }
+            })
+        }
+        console.log(response)
+        const token = generateToken(response?.gstin || "",company);
+        res.status(200).json({token});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({msg:"error"});
+    }
+}
+
+export const getCustomers = async (req:any,res:any)=>{
+    try{
+        const {trigram} = req.body;
+
+        const company = req.query.company;
+        let response;
+        if(company==='a'){
+            response = await prisma.a_User.findMany({
+                where:{
+                    sales:trigram,
+                }
+            })
+        }
+        else if(company==='s'){
+            response = await prisma.s_User.findMany({
+                where:{
+                    sales:trigram,
+                }
+            })
+        }
+        else if(company==='t'){
+            response = await prisma.t_User.findMany({
+                where:{
+                    sales:trigram,
+                }
+            })
+        }
+        console.log(response)
+        res.status(200).json({response});
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({msg:"error"});
+    }
+}
+
 export const getUserInfo = async (req:any,res:any)=>{
     const {gstNo} = req.body;
     const company = req.query.company;
