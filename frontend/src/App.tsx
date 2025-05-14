@@ -1,12 +1,8 @@
-
+// by GAETAN
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import { Login } from './pages/Login';
-
 import { Register } from './pages/Register';
-
 import { HomePage } from './pages/Home';
-
-
 import {OrdersPage} from './pages/OrderDetails';
 import { ProductsPage } from './pages/Products';
 import { BookPage } from './pages/Book';
