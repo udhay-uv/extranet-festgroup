@@ -16,6 +16,8 @@ export const orderDetails = async (req:any,res:any)=>{
                 orderDetails:true,
                     billingAddress:true,
                     shippingAddress:true,
+
+                    
                 }
             })      
         }

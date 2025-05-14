@@ -427,7 +427,7 @@ export function Login() {
                 href={`/${company}/register`}
                 className={`font-medium text-${companyMap[company as keyof typeof companyMap].color}-600 hover:text-${companyMap[company as keyof typeof companyMap].color}-500`}
               >
-                Create Account
+                Create Accounts
               </a>
             </p>
           </motion.div>
