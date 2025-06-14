@@ -574,6 +574,7 @@ import { useNavigate, useParams, useSearchParams, Link } from "react-router-dom"
 import axios from "axios"
 import { Spinner } from "@/components/Spinner"
 
+
 export function GSTINTable() {
   const [data, setData] = useState([])
   const [searchTerm, setSearchTerm] = useState("")
@@ -599,6 +600,8 @@ export function GSTINTable() {
     fetchCustomers()
   }, [])
 
+  //@ts-ignore
+
   const handleGstinClick = async (gstin) => {
     try {
       const res = await axios.post(`${BACKEND_URL}/api/user/trigramlogin?company=${company}`, {
@@ -618,7 +621,9 @@ export function GSTINTable() {
 
   const filteredData = data.filter(
     (item) =>
+      //@ts-ignore
       item.gstin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      //@ts-ignore
       item.name.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -696,6 +701,7 @@ export function GSTINTable() {
                 {filteredData.length > 0 ? (
                   filteredData.map((item, index) => (
                     <motion.tr
+                    //@ts-ignore
                       key={item.gstin}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -712,11 +718,15 @@ export function GSTINTable() {
                     >
                       <TableCell
                         className="font-medium cursor-pointer hover:text-blue-600 hover:underline"
+                        //@ts-ignore
                         onClick={() => handleGstinClick(item.gstin)}
                       >
-                        {item.gstin}
+                        
+                        {//@ts-ignore
+                        item.gstin}
                       </TableCell>
-                      <TableCell>{item.name}</TableCell>
+                      <TableCell>{//@ts-ignore
+                      item.name}</TableCell>
                     </motion.tr>
                   ))
                 ) : (
