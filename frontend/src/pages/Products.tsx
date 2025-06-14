@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { PiSolarPanelBold } from "react-icons/pi";
+import { GiSteelClaws } from "react-icons/gi";
 import { 
   Battery, 
   Zap,
@@ -19,6 +21,7 @@ import { Spinner } from '@/components/Spinner';
 import { useNavigate, useParams } from 'react-router-dom';
 import { companyMap } from '@/lib/config';
 import useFavicon from '@/lib/faviconhook';
+
 type Product = {
   brand: string;
   company: string;
@@ -31,7 +34,7 @@ type Product = {
 };
 
 
-type ProductType = 'all' | 'G' | 'H' | 'B' | 'M' | 'P';
+type ProductType = 'all' | 'G' | 'H' | 'B' | 'M' | 'P' | 'S';
 type ViewMode = 'grid' | 'list';
 
 const productTypeInfo = {
@@ -39,8 +42,9 @@ const productTypeInfo = {
   'G': { label: 'On-Grid Inverters', icon: Zap },
   'H': { label: 'Hybrid Inverters', icon: CircuitBoard },
   'B': { label: 'Batteries', icon: Battery },
-  'M': { label: 'Miscellaneous', icon: Cable },
-  'P': { label: 'Pallets', icon: Palette }
+  'M': { label: 'Accessories', icon: Cable },
+  'P': { label: 'Module', icon: PiSolarPanelBold },
+  'S': { label: 'Mounting', icon: GiSteelClaws }
 };
 
 export const ProductsPage = () => {

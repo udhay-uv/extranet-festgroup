@@ -64,6 +64,8 @@ export const register = async (req:any,res:any)=>{
 export const login = async (req:any,res:any)=>{
     const {gstNo,password} = req.body;
     const company = req.query.company;
+    console.log(gstNo+" "+password)
+    console.log(company)
     try{
         let response;
         if(company==='a'){
