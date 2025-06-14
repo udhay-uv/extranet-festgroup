@@ -7,7 +7,7 @@ const isDev = import.meta.env.MODE === 'development';
 
 export const BACKEND_URL = isDev
   ? "http://localhost:3000"
-  : "https://extranet-festgroup-backend.vercel.app"
+  : "https://bop-festgroup-backend.vercel.app"
 
 
 
