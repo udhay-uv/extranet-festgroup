@@ -33,22 +33,22 @@ type Product = {
   quantity: number;
 };
 
-
+type ProductFamily= "ALL" | "ONGIRD" | "HYBRID" | "BATTERY" | "MODULES" | "ACCESSORIES" | "MOUNTING" | 'BOS'
 type ProductType = 'all' | 'G' | 'H' | 'B' | 'M' | 'P' | 'S';
 type ViewMode = 'grid' | 'list';
-
+111
 const productTypeInfo = {
-  'all': { label: 'All Products', icon: Package },
-  'G': { label: 'On-Grid Inverters', icon: Zap },
-  'H': { label: 'Hybrid Inverters', icon: CircuitBoard },
-  'B': { label: 'Batteries', icon: Battery },
-  'M': { label: 'Accessories', icon: Cable },
-  'P': { label: 'Module', icon: PiSolarPanelBold },
-  'S': { label: 'Mounting', icon: GiSteelClaws }
+  'ALL': { label: 'All Products', icon: Package },
+  'ONGRID': { label: 'On-Grid Inverters', icon: Zap },
+  'HYBRID': { label: 'Hybrid Inverters', icon: CircuitBoard },
+  'BATTERY': { label: 'Batteries', icon: Battery },
+  'ACCESSORIES': { label: 'Accessories', icon: Cable },
+  'MODULES': { label: 'Module', icon: PiSolarPanelBold },
+  'MOUNTING': { label: 'Mounting', icon: GiSteelClaws }
 };
 
 export const ProductsPage = () => {
-  const [activeType, setActiveType] = useState<ProductType>('all');
+  const [activeFamily, setActiveFamily] = useState<ProductFamily>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   const [products,setProducts]=useState<Product[] | null>(null);
@@ -62,14 +62,14 @@ export const ProductsPage = () => {
          return null;
       }
       return products.filter(product => {
-    const matchesType = activeType === 'all' || product.type === activeType;
+    const matchesType = activeFamily === 'ALL' || product.family === activeFamily;
     const matchesSearch = product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          product.mn.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesType && matchesSearch;
   });
    
 
-  },[products,activeType,searchQuery]);
+  },[products,activeFamily,searchQuery]);
 
   useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
 
@@ -184,19 +184,19 @@ export const ProductsPage = () => {
             </div>
 
             <div className="flex flex-wrap gap-2">
-              {(Object.keys(productTypeInfo) as ProductType[]).map((type) => (
+              {(Object.keys(productTypeInfo) as ProductFamily[]).map((type) => (
                 <motion.button
                   key={type}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => setActiveType(type)}
+                  onClick={() => setActiveFamily(type)}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    activeType === type
+                    activeFamily === type
                       ? `bg-${companyMap[company as keyof typeof companyMap].color}-600 text-white`
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  {React.createElement(productTypeInfo[type].icon, { className: 'w-5 h-5' })}
+                  {/* {React.createElement(productTypeInfo[type].icon, { className: 'w-5 h-5' })} */}
                   {productTypeInfo[type].label}
                 </motion.button>
               ))}
@@ -205,7 +205,7 @@ export const ProductsPage = () => {
 
           <AnimatePresence mode="wait">
             <motion.div
-              key={activeType + searchQuery + viewMode}
+              key={activeFamily + searchQuery + viewMode}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}

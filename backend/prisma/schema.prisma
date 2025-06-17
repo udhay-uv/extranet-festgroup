@@ -75,8 +75,8 @@ model A_OrderDetails{
   
 
 
-  order A_Order @relation(fields: [orderId], references: [orderNo])
-  product Product @relation(fields: [modelNumber], references: [mn])
+  order A_Order @relation(fields: [orderId], references: [orderNo],onDelete: Cascade)
+  product Product @relation(fields: [modelNumber], references: [mn],onDelete: Cascade)
 }
 
 
@@ -138,7 +138,7 @@ model S_OrderDetails{
   totalAmount Decimal
 
   order S_Order @relation(fields: [orderId], references: [orderNo])
-  product Product @relation(fields: [modelNumber], references: [mn])
+  product Product @relation(fields: [modelNumber], references: [mn],onDelete: Cascade)
 }
 
 model T_User{
@@ -198,25 +198,34 @@ model T_OrderDetails{
   sgst Decimal
   totalAmount Decimal
 
-  order T_Order @relation(fields: [orderId], references: [orderNo])
-  product Product @relation(fields: [modelNumber], references: [mn])
+  order T_Order @relation(fields: [orderId], references: [orderNo],onDelete: Cascade)
+  product Product @relation(fields: [modelNumber], references: [mn],onDelete: Cascade)
 }
 
 
 model Product{
   id Int @id @default(autoincrement())
-  brand String
-  company String
-  family String?
-  mn String @unique
-  type String
-  power String?
-  description String?
-  quantity Int
+  brand String @default("")
+  company String @default("")
+  igst Decimal @default(0.0)
+  pn String? @default("")
+  mn String @unique @default("")
+  family String @default("")
+  power Decimal? @default(0.0)
+  description String @default("")
+  active Boolean @default(false)
+  type String? @default("")
+  group String? @default("")
+  desc_offcial String @default("")
+  brand_short String @default("")
+  mn_pn String  @default("")
 
 
   orderDetails_A A_OrderDetails[]
   orderDetails_S S_OrderDetails[]
   orderDetails_T T_OrderDetails[]
 }
+
+
+
 

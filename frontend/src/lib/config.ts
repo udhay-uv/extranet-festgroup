@@ -23,14 +23,20 @@ export const companyMap = {
     },
     "s": {  
         name: "Semicon",
-        color: "blue",
+        color: "green",
         image:"s.png",
         favicon:"s_favicon.png"
     },
     "t": {
         name: "Feston",
-        color: "blue",
+        color: "indigo",
         image:"t.png",
         favicon:"t_favicon.png"
+    },
+     "g": {
+        name: "Group",
+        color: "orange",
+        image:"g.png",
+        favicon:"g_favicon.png"
     }
 }
