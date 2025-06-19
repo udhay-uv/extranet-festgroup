@@ -678,6 +678,22 @@ async function main() {
         desc_offcial: "#36Nos - ADANI Bifacial 535Wp Topcon DCR Module | FULL Pallet",
         brand_short: "ADANI"
       },
+      {
+        brand: "ADANI",
+        company: "A",
+        igst: 12,
+        mn: "ASB-M10-144-535",
+        pn: "",
+        mn_pn: "ASB-M10-144-535",
+        family: "MODULES",
+        power: 0.535,
+        description: "Bifacial 535Wp Topcon DCR Module",
+        active: true,
+        type: "DCR",
+        group: "1",
+        desc_offcial: "ADANI Bifacial 535Wp Topcon DCR Module | 1 Pc Only",
+        brand_short: "ADANI"
+      },
     ],
     skipDuplicates: true // prevents error if the 'mn' unique key already exists
   });

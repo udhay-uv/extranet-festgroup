@@ -27,3 +27,4 @@ frontend/.vscode/*
 *.njsproj
 *.sln
 *.sw?
+.vercel
