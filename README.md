@@ -1,3 +1,4 @@
+
 # Festgroup Extranet 
 
 This project consists of a frontend and backend application that can be run locally using a simple startup script.
@@ -59,4 +60,7 @@ cd ../backend && npm install
 ## 🤝 Contributions
 
 Feel free to open issues or submit pull requests!
+
+
+# extranet-festgroup
 
