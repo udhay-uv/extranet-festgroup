@@ -85,11 +85,10 @@ export const BookPage = () => {
             : p,
         );
       }
-      return [...prev, { product, quantity: 1, unitPrice: 25000, cgst: 6, sgst: 6 }];
+      return [...prev, { product, quantity: 1, unitPrice: 25000, cgst: 0, sgst:  0}];
     });
     setIsProductDialogOpen(false);
   };
-
   const handleQuantityChange = (mn: string, change: number) => {
     setSelectedProducts((prev) =>
       prev.map((p) => {
@@ -181,31 +180,67 @@ export const BookPage = () => {
     setButtonLoading(false);
   };
 
-  async function fetchDetails() {
-    const res1 = await axios.post(`${BACKEND_URL}/api/product/list?company=${company}`, {
-      token: localStorage.getItem(`${company}_token`),
-      company: company?.toUpperCase(),
-    });
-    console.log(res1.data);
-    if(res1.data.msg==='Unauthorized'){
-      localStorage.removeItem(`${company}_token`);
-      navigate(`/${company}/login`);
-    }   
-    const res2 = await axios.post(`${BACKEND_URL}/api/user/info?company=${company}`, {
-      token: localStorage.getItem(`${company}_token`),
-      company: company?.toUpperCase(),
-    });
-    if(res2.data.msg==='Unauthorized'){
-      localStorage.removeItem(`${company}_token`);
-      navigate(`/${company}/login`);
-    }
+  // async function fetchDetails() {
+  //   const res1 = await axios.post(`${BACKEND_URL}/api/product/list?company=${company}`, {
+  //     token: localStorage.getItem(`${company}_token`),
+  //     company: company?.toUpperCase(),
+  //   });
+  //   console.log(res1.data);
+  //   if(res1.data.msg==='Unauthorized'){
+  //     localStorage.removeItem(`${company}_token`);
+  //     navigate(`/${company}/login`);
+  //   }   
+  //   const res2 = await axios.post(`${BACKEND_URL}/api/user/info?company=${company}`, {
+  //     token: localStorage.getItem(`${company}_token`),
+  //     company: company?.toUpperCase(),
+  //   });
+  //   if(res2.data.msg==='Unauthorized'){
+  //     localStorage.removeItem(`${company}_token`);
+  //     navigate(`/${company}/login`);
+  //   }
 
-    setProducts(res1.data.products);
-    setAddresses(res2.data.address);
-    console.log(res1.data.products);
-    console.log(res2.data.address);
-    setLoading(false);
+  //   setProducts(res1.data.products);
+  //   setAddresses(res2.data.address);
+  //   console.log(res1.data.products);
+  //   console.log(res2.data.address);
+  //   setLoading(false);
+  // }
+  async function fetchDetails() {
+  const res1 = await axios.post(`${BACKEND_URL}/api/product/list?company=${company}`, {
+    token: localStorage.getItem(`${company}_token`),
+    company: company?.toUpperCase(),
+  });
+
+  if (res1.data.msg === 'Unauthorized') {
+    localStorage.removeItem(`${company}_token`);
+    navigate(`/${company}/login`);
   }
+
+  const res2 = await axios.post(`${BACKEND_URL}/api/user/info?company=${company}`, {
+    token: localStorage.getItem(`${company}_token`),
+    company: company?.toUpperCase(),
+  });
+
+  if (res2.data.msg === 'Unauthorized') {
+    localStorage.removeItem(`${company}_token`);
+    navigate(`/${company}/login`);
+  }
+
+  setProducts(res1.data.products);
+  setAddresses(res2.data.address);
+
+  // ✅ Auto-select first available billing and shipping address
+  const billing = res2.data.address.find((a: Address) => a.bs === "Billing");
+  const shipping = res2.data.address.find((a: Address) => a.bs === "Shipping");
+
+  if (billing) setSelectedBillingAddress(billing);
+  if (shipping) setSelectedShippingAddress(shipping);
+
+  setLoading(false);
+}
+ 
+
+
 
   useFavicon(`/${companyMap[company as keyof typeof companyMap].favicon}`);
 

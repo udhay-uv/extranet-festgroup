@@ -25,9 +25,16 @@ const BACKEND_PORT = 3000;
 app.listen(BACKEND_PORT,()=>{
     console.log("Running" +BACKEND_PORT)
 })
+//   const PORT = 3001;
+// app.listen(PORT, () => {
+//   console.log(`Server running on http://localhost:${PORT}`);
+// });
 
 
 app.get("/check",(req,res:any)=>{
     return res.json({message:"Running"})
 })
 
+// app.get("/", (req, res) => {
+//   res.send("Backend running!");
+// });

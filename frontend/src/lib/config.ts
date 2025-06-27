@@ -23,13 +23,13 @@ export const companyMap = {
     },
     "s": {  
         name: "Semicon",
-        color: "green",
+        color: "blue",
         image:"s.png",
         favicon:"s_favicon.png"
     },
     "t": {
         name: "Feston",
-        color: "indigo",
+        color: "blue",
         image:"t.png",
         favicon:"t_favicon.png"
     },

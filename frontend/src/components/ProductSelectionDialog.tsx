@@ -7,9 +7,11 @@ import {
   Package,
   Cable,
   CircuitBoard,
-  Palette,
+  // Palette,
   LayoutList,
   Grid,
+  PanelTopOpen,  // for "Modules"
+  MoveDiagonal2, 
   X
 } from 'lucide-react';
 
@@ -24,7 +26,7 @@ type Product = {
   quantity: number;
 };
 
-type ProductType = 'all' | 'G' | 'H' | 'B' | 'M' | 'P';
+type ProductType = 'all' | 'G' | 'H' | 'B' | 'M' | 'P'| 'S';
 type ViewMode = 'grid' | 'list';
 
 interface ProductSelectionDialogProps {
@@ -39,8 +41,11 @@ const productTypeInfo = {
   'G': { label: 'On-Grid Inverters', icon: Zap },
   'H': { label: 'Hybrid Inverters', icon: CircuitBoard },
   'B': { label: 'Batteries', icon: Battery },
-  'M': { label: 'Miscellaneous', icon: Cable },
-  'P': { label: 'Pallets', icon: Palette }
+  // 'M': { label: 'Miscellaneous', icon: Cable },
+  // 'P': { label: 'Pallets', icon: Palette }
+ 'ACCESSORIES': { label: 'Accessories', icon: Cable },
+ 'MODULES': { label: 'Modules', icon: PanelTopOpen },
+ 'MOUNTING': { label: 'Mounting', icon: MoveDiagonal2 }
 };
 
 export const ProductSelectionDialog: React.FC<ProductSelectionDialogProps> = ({

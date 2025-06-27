@@ -10,6 +10,7 @@ import {OrdersPage} from './pages/OrderDetails';
 import { ProductsPage } from './pages/Products';
 import { BookPage } from './pages/Book';
 import { GSTINTable } from './pages/CustomerTable';
+import { OrderSuccessPage } from "@/pages/OrderSuccessPage";
 
 function App() {
 
@@ -29,6 +30,7 @@ function App() {
         <Route path="/:company/orders" element={<OrdersPage />} />
         <Route path="/:company/products" element={<ProductsPage />} />
         <Route path="/:company/book" element={<BookPage />} />
+        <Route path="/:company/order-success/:orderId" element={<OrderSuccessPage />} />
 
 
       </Routes>

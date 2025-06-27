@@ -16,6 +16,7 @@ export default defineConfig({
   server: {
     host: true, // or '0.0.0.0' to allow connections from network
     port: 8888  // optional: to fix the port
-  }
+  },
+    
 })
 

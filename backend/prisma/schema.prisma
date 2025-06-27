@@ -1,3 +1,4 @@
+
 //This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -41,6 +42,21 @@ model A_Address{
   A_order A_Order[] @relation("billingAddress")
   A_order2 A_Order[] @relation("shippingAddress")
 }
+
+//     model A_Address {
+//   id           Int      @id @default(autoincrement())
+//   gstin        String
+//   bs           String
+//   type         String
+//   address      String
+//   phone        String
+//   contactName  String
+//   email        String?    // ✅ Must exist
+//   user         A_User     @relation(fields: [gstin], references: [gstin])
+//   A_order      A_Order[]  @relation("billingAddress")
+//   A_order2     A_Order[]  @relation("shippingAddress")
+// }
+
 
 model A_Order{
   id Int @id @default(autoincrement())
@@ -107,6 +123,22 @@ model S_Address{
   S_order2 S_Order[] @relation("shippingAddress")
 }
 
+//   model S_Address {
+//   id           Int      @id @default(autoincrement())
+//   gstin        String
+//   bs           String
+//   type         String
+//   address      String
+//   phone        String
+//   contactName  String
+//   email        String?    // ✅ Must exist
+//   user         S_User     @relation(fields: [gstin], references: [gstin])
+//   S_order      S_Order[]  @relation("billingAddress")
+//   S_order2     S_Order[]  @relation("shippingAddress")
+// }
+
+
+
 model S_Order{
   id Int @id @default(autoincrement())
   orderNo String @unique
@@ -168,6 +200,22 @@ model T_Address{
   T_order2 T_Order[] @relation("shippingAddress")
 }
 
+//     model T_Address {
+//   id           Int      @id @default(autoincrement())
+//   gstin        String
+//   bs           String
+//   type         String
+//   address      String
+//   phone        String
+//   contactName  String
+//   email        String?    // ✅ Must exist
+//   user         T_User     @relation(fields: [gstin], references: [gstin])
+//   T_order      T_Order[]  @relation("billingAddress")
+//   T_order2     T_Order[]  @relation("shippingAddress")
+// }
+
+
+
 model T_Order{
   id Int @id @default(autoincrement())
   orderNo String @unique
@@ -225,7 +273,3 @@ model Product{
   orderDetails_S S_OrderDetails[]
   orderDetails_T T_OrderDetails[]
 }
-
-
-
-
